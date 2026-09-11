@@ -34,3 +34,7 @@ git submodule add https://github.com/bytepine/UnLua.git Plugins/UnLua
 ## 许可
 
 见 [LICENSE.TXT](LICENSE.TXT)。上游版权归 Tencent；Lua 归 Lua.org, PUC-Rio。本仓修改同样使用 MIT。
+
+## 变更
+
+本仓相对官方 v2.3.6 的改动见 [CHANGELOG.md](CHANGELOG.md)。
