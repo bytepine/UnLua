@@ -37,4 +37,4 @@ git submodule add https://github.com/bytepine/UnLua.git Plugins/UnLua
 
 ## 变更
 
-本仓相对官方 v2.3.6 的改动见 [CHANGELOG.md](CHANGELOG.md)。
+本仓相对官方 v2.3.6 的改动见 [CHANGELOG.md](CHANGELOG.md)。写入规范见 [CONTRIBUTING.md](CONTRIBUTING.md)。
