@@ -14,7 +14,20 @@
 
 #include "LuaOverridesClass.h"
 #include "LuaFunction.h"
+#include "UnLuaBase.h"
 #include "UnLuaVersionCompat.h"
+
+namespace
+{
+    UField* GetNextField(const UField* Field)
+    {
+#if UL_UE_HAS_UFIELD_NEXT_TOBJECTPTR
+        return Field->Next.Get();
+#else
+        return Field->Next;
+#endif
+    }
+}
 
 ULuaOverridesClass* ULuaOverridesClass::Create(UClass* Class)
 {
@@ -72,12 +85,31 @@ void ULuaOverridesClass::AddToOwner()
         return;
 
 #if UL_UE_HAS_USTRUCT_CHILDREN_TOBJECTPTR
-    auto ChildrenPtr = Class->Children.Get();
-
-    auto Field = &ChildrenPtr;
+    // TObjectPtr 不能取址当链表头：.Get() 得到的是局部副本，写入会丢失
+    UField* Head = Class->Children.Get();
+    if (!Head)
+    {
+        UE_LOG(LogUnLua, Log, TEXT("ULuaOverridesClass::AddToOwner: %s Children 为空，直接写链首"), *GetNameSafe(Class));
+        Class->Children = this;
+    }
+    else if (Head != this)
+    {
+        UField* Node = Head;
+        while (true)
+        {
+            UField* NextField = GetNextField(Node);
+            if (NextField == this)
+                break;
+            if (!NextField)
+            {
+                Node->Next = this;
+                break;
+            }
+            Node = NextField;
+        }
+    }
 #else
     auto Field = &(Class->Children);
-#endif
     while (*Field)
     {
         if (*Field == this)
@@ -85,15 +117,12 @@ void ULuaOverridesClass::AddToOwner()
             Field = nullptr;
             break;
         }
-#if UL_UE_HAS_UFIELD_NEXT_TOBJECTPTR
-        Field = (UField**)&((*Field)->Next);
-#else
         Field = &(*Field)->Next;
-#endif
     }
 
     if (Field)
         *Field = this;
+#endif
 
     if (Class->IsRooted() || GUObjectArray.IsDisregardForGC(Class))
         AddToRoot();
@@ -106,12 +135,24 @@ void ULuaOverridesClass::RemoveFromOwner()
         return;
 
 #if UL_UE_HAS_USTRUCT_CHILDREN_TOBJECTPTR
-    auto ChildrenPtr = Class->Children.Get();
-
-    auto Field = &ChildrenPtr;
+    UField* Head = Class->Children.Get();
+    if (Head == this)
+    {
+        Class->Children = nullptr;
+    }
+    else
+    {
+        for (UField* Node = Head; Node; Node = GetNextField(Node))
+        {
+            if (GetNextField(Node) == this)
+            {
+                Node->Next = nullptr;
+                break;
+            }
+        }
+    }
 #else
     auto Field = &Class->Children;
-#endif
     while (*Field)
     {
         if (*Field == this)
@@ -119,12 +160,9 @@ void ULuaOverridesClass::RemoveFromOwner()
             *Field = nullptr;
             break;
         }
-#if UL_UE_HAS_UFIELD_NEXT_TOBJECTPTR
-        Field = (UField**)&((*Field)->Next);
-#else
         Field = &(*Field)->Next;
-#endif
     }
+#endif
 
     if (!Class->IsRooted() && !GUObjectArray.IsDisregardForGC(Class))
         RemoveFromRoot();

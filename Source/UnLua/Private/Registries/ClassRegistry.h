@@ -59,6 +59,8 @@ namespace UnLua
 
         TMap<UStruct*, FClassDesc*> Classes;
         TMap<FName, FClassDesc*> Name2Classes;
+        // 已从索引摘除、但不能 delete 的 desc（Lua 闭包 upvalue 仍可能持有指针）
+        TArray<FClassDesc*> Retired;
 
         FLuaEnv* Env;
     };

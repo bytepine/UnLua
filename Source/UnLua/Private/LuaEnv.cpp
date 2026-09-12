@@ -32,6 +32,11 @@
 #include "UnLuaLuaInternalBegin.h"
 #include "lstate.h"
 #include "UnLuaLuaInternalEnd.h"
+#include "UnLuaPrivate.h"
+
+UNLUA_DECLARE_CYCLE_STAT("LuaEnv TryBind", UnLua_LuaEnv_TryBind);
+UNLUA_DECLARE_CYCLE_STAT("LuaEnv TryReplaceInputs", UnLua_LuaEnv_TryReplaceInputs);
+UNLUA_DECLARE_CYCLE_STAT("LuaEnv NotifyUObjectDeleted", UnLua_LuaEnv_NotifyUObjectDeleted);
 
 namespace UnLua
 {
@@ -179,6 +184,10 @@ namespace UnLua
 
     FLuaEnv::~FLuaEnv()
     {
+        // 先摘 GUObjectArray 监听，避免后续 delete registry 后仍收到 NotifyUObjectDeleted
+        UnRegisterDelegates();
+        FWorldDelegates::OnWorldTickStart.Remove(OnWorldTickStartHandle);
+
         OnDestroyed.Broadcast(*this);
         lua_close(L);
         AllEnvs.Remove(L);
@@ -202,10 +211,7 @@ namespace UnLua
         AutoObjectReference.Clear();
         ManualObjectReference.Clear();
 
-        UnRegisterDelegates();
-
         CandidateInputComponents.Empty();
-        FWorldDelegates::OnWorldTickStart.Remove(OnWorldTickStartHandle);
     }
 
     TMap<lua_State*, FLuaEnv*>& FLuaEnv::GetAll()
@@ -270,7 +276,10 @@ namespace UnLua
 
     void FLuaEnv::NotifyUObjectDeleted(const UObjectBase* ObjectBase, int32 Index)
     {
+        UNLUA_SCOPE_CYCLE_COUNTER(UnLua_LuaEnv_NotifyUObjectDeleted);
+
         UObject* Object = (UObject*)ObjectBase;
+        ClassTraits.Remove(static_cast<const UClass*>(Object));
         PropertyRegistry->NotifyUObjectDeleted(Object);
         FunctionRegistry->NotifyUObjectDeleted(Object);
         if (Manager)
@@ -295,6 +304,8 @@ namespace UnLua
 
     bool FLuaEnv::TryReplaceInputs(UObject* Object)
     {
+        UNLUA_SCOPE_CYCLE_COUNTER(UnLua_LuaEnv_TryReplaceInputs);
+
         if (Object->HasAnyFlags(RF_ClassDefaultObject | RF_ArchetypeObject)
             || !Object->IsA<UInputComponent>())
             return false;
@@ -341,15 +352,34 @@ namespace UnLua
 
     bool FLuaEnv::TryBind(UObject* Object)
     {
+        UNLUA_SCOPE_CYCLE_COUNTER(UnLua_LuaEnv_TryBind);
+
         const auto Class = Object->IsA<UClass>() ? static_cast<UClass*>(Object) : Object->GetClass();
         if (Class->HasAnyClassFlags(CLASS_NewerVersionExists))
         {
-            // filter out recompiled objects
+            // filter out recompiled objects；重编译中间态不进缓存
             return false;
         }
 
-        static UClass* InterfaceClass = UUnLuaInterface::StaticClass();
-        const bool bImplUnluaInterface = Class->ImplementsInterface(InterfaceClass);
+        EClassBindTrait Trait;
+        if (const auto Cached = ClassTraits.Find(Class))
+        {
+            Trait = *Cached;
+        }
+        else
+        {
+            static UClass* InterfaceClass = UUnLuaInterface::StaticClass();
+            // 接口继承链遍历与 SKEL_ 名字判断（含 FString 堆分配）收敛到每个 UClass 一次
+            if (Class->GetName().Contains(TEXT("SKEL_")))
+                Trait = EClassBindTrait::Reject;
+            else
+                Trait = Class->ImplementsInterface(InterfaceClass)
+                            ? EClassBindTrait::StaticBind : EClassBindTrait::DynamicOnly;
+            ClassTraits.Add(Class, Trait);
+        }
+        if (Trait == EClassBindTrait::Reject)
+            return false;
+        const bool bImplUnluaInterface = (Trait == EClassBindTrait::StaticBind);
 
         if (IsInAsyncLoadingThread())
         {
@@ -371,9 +401,6 @@ namespace UnLua
 
             return GetManager()->Bind(Object, *GLuaDynamicBinding.ModuleName, GLuaDynamicBinding.InitializerTableRef);
         }
-
-        if (Class->GetName().Contains(TEXT("SKEL_")))
-            return false;
 
         if (!ensureMsgf(ModuleLocator, TEXT("Invalid lua module locator, lua binding will not work properly. please check unlua runtime settings.")))
             return false;

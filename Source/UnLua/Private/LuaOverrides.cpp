@@ -47,7 +47,8 @@ namespace UnLua
         }
         else
         {
-            LuaFunction = Cast<ULuaFunction>(Function);
+            // 已经是 ULuaFunction（bAddNew 路径添加的），或原 UFunction 已被就地覆写过
+            LuaFunction = ULuaFunction::Get(Function);
             if (LuaFunction)
             {
                 LuaFunction->Initialize();

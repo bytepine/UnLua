@@ -184,5 +184,13 @@ namespace UnLua
         FString Name = TEXT("Env_0");
         bool bObjectArrayListenerRegistered;
         bool bStarted;
+
+        enum class EClassBindTrait : uint8
+        {
+            Reject,      // SKEL_ 骨架类，直接拒绝
+            DynamicOnly, // 未实现 UnLuaInterface，只可能走动态绑定
+            StaticBind,  // 实现了 UnLuaInterface
+        };
+        TMap<const UClass*, EClassBindTrait> ClassTraits;
     };
 }

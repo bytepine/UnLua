@@ -33,8 +33,13 @@ namespace UnLua
 
     FClassRegistry::~FClassRegistry()
     {
+        TSet<FClassDesc*> Unique;
         for (const auto Pair : Name2Classes)
-            delete Pair.Value;
+            Unique.Add(Pair.Value);
+        for (const auto Desc : Retired)
+            Unique.Add(Desc);
+        for (const auto Desc : Unique)
+            delete Desc;
     }
 
     void FClassRegistry::Initialize()
@@ -111,9 +116,9 @@ namespace UnLua
         if (Type == LUA_TTABLE)
         {
             FClassDesc* Ret = Find(MetatableName);
-            if (Ret && Ret->IsClass() && !Ret->IsStructValid())
+            if (Ret && !Ret->IsStructValid())
             {
-                // unregister invalid metatable
+                // unregister invalid metatable（含 UScriptStruct）
                 Unregister(Ret, true);
             }
             else
@@ -267,8 +272,15 @@ namespace UnLua
         const auto Desc = Find(Class);
         if (!Desc)
             return;
+
+        // 键就在手上，O(1) 摘除；否则 Classes 里留下悬垂的 UStruct*，
+        // UE 复用同一地址分配新 UStruct 时会命中已失效的 desc
+        Classes.Remove(Class);
+        Name2Classes.Remove(FName(*Desc->GetName()));
+
         Desc->UnLoad();
         Unregister(Desc, true);
+        Retired.AddUnique(Desc);
     }
 
     void FClassRegistry::NotifyUObjectDeleted(UObject* Object)
@@ -318,5 +330,14 @@ namespace UnLua
         const auto MetatableName = ClassDesc->GetName();
         lua_pushnil(L);
         lua_setfield(L, LUA_REGISTRYINDEX, TCHAR_TO_UTF8(*MetatableName));
+
+        // PushMetatable 失效路径也可能走到这里：同步摘除索引并进墓地
+        for (auto It = Classes.CreateIterator(); It; ++It)
+        {
+            if (It.Value() == ClassDesc)
+                It.RemoveCurrent();
+        }
+        Name2Classes.Remove(FName(*MetatableName));
+        Retired.AddUnique(const_cast<FClassDesc*>(ClassDesc));
     }
 }
