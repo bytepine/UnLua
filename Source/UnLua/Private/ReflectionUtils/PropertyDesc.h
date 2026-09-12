@@ -25,7 +25,7 @@
  */
 enum
 {
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION > 22)
+#if UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
     CPT_MulticastSparseDelegate = CPT_Unused_Index_19,
 #endif
     CPT_Enum = CPT_Unused_Index_21,

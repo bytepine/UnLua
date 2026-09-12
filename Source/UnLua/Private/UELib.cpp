@@ -113,7 +113,7 @@ static int32 Global_NewObject(lua_State *L)
             TableRef = luaL_ref(L, LUA_REGISTRYINDEX);
         }
         FScopedLuaDynamicBinding Binding(L, Class, UTF8_TO_TCHAR(ModuleName), TableRef);
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 26
+#if !UL_UE_HAS_STATIC_CONSTRUCT_OBJECT_PARAMS
         UObject* Object = StaticConstructObject_Internal(Class, Outer, Name);
 #else
         FStaticConstructObjectParameters ObjParams(Class);

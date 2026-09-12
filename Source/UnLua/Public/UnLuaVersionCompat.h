@@ -18,7 +18,12 @@
 
 // ── 语义别名：按 API 变更点命名 ──
 
+#define UL_UE_HAS_DEFINE_FUNCTION_MACRO         UL_UE_AT_LEAST(4, 19) // DEFINE_FUNCTION / FNativeFuncPtr
+#define UL_UE_HAS_INPUT_ACTION_GETTERS          UL_UE_AT_LEAST(4, 20) // FInputActionBinding::GetActionName/IsPaired
+#define UL_UE_HAS_INVTEXT_DEFAULT_PARAM         UL_UE_AT_LEAST(4, 21) // FText 默认参数 INVTEXT("...")
+#define UL_UE_HAS_TMAP_GETDATA_KEY_INLINE       UL_UE_AT_LEAST(4, 22) // TMap::GetData 已含 Key，不再加 KeyOffset
 #define UL_UE_HAS_TMODELS_GET_TYPE_HASHABLE     UL_UE_AT_LEAST(4, 23) // THasGetTypeHash → TModels<CGetTypeHashable>
+#define UL_UE_HAS_SPARSE_MULTICAST_DELEGATE     UL_UE_AT_LEAST(4, 23) // FMulticastSparseDelegate / AddDelegate / CPT_MulticastSparseDelegate
 #define UL_UE_HAS_STD_IS_SAME_V                 UL_UE_AT_LEAST(5, 2)  // TIsSame → std::is_same_v
 #define UL_UE_HAS_USTRUCT_CHILDREN_TOBJECTPTR   UL_UE_AT_LEAST(5, 3)  // UStruct::Children 为 TObjectPtr，需 .Get()
 #define UL_UE_HAS_UFUNCTION_SUPER_BIND           UL_UE_AT_LEAST(5, 3)  // UFunction::Bind 走 Super::Bind
@@ -40,8 +45,25 @@
 #define UL_UE_HAS_REFCOLLECTOR_TOBJECTPTR            UL_UE_AT_LEAST(5, 4)  // AddReferencedObjects 要 TObjectPtr
 #define UL_UE_HAS_MULTICAST_PROCESS_DELEGATE        UL_UE_AT_LEAST(5, 8)  // ProcessMulticastDelegate → ProcessDelegate
 #define UL_UE_HAS_ASSET_SOFT_OBJECT_PATH            UL_UE_AT_LEAST(5, 1)  // FAssetData::GetSoftObjectPath
+#define UL_UE_HAS_FIND_FIRST_OBJECT             UL_UE_AT_LEAST(5, 1)  // 引擎提供 FindFirstObject；此前垫片
+#define UL_UE_HAS_CLASS_PATHS                   UL_UE_AT_LEAST(5, 1)  // FARFilter::ClassNames → ClassPaths；FAssetData::AssetClassPath
+#define UL_UE_HAS_APP_STYLE                     UL_UE_AT_LEAST(5, 1)  // FEditorStyle → FAppStyle
+#define UL_UE_HAS_TOP_LEVEL_ASSET_PATH          UL_UE_AT_LEAST(5, 1)  // ImplementNewInterface/RemoveInterface 走 FTopLevelAssetPath
+#define UL_UE_HAS_ASSETREGISTRY_NESTED_HEADER   UL_UE_AT_LEAST(5, 2)  // AssetRegistry/AssetRegistryModule.h（对齐原 UE_VERSION_NEWER_THAN(5,1,0)）
+#define UL_UE_HAS_UE_DISABLE_OPTIMIZATION       UL_UE_AT_LEAST(5, 2)  // PRAGMA_DISABLE_OPTIMIZATION → UE_DISABLE_OPTIMIZATION
+#define UL_UE_HAS_TOBJECTPTR_FIELD_GET          UL_UE_AT_LEAST(5, 3)  // TObjectPtr MetaClass/PropertyClass 需 .Get()
 #define UL_UE_HAS_UPROPERTY_TYPE                    (!UL_UE_AT_LEAST(4, 25)) // 4.25 前 FProperty 仍是 UProperty
 #define UL_UE_HAS_FOREACH_OBJECT_WITH_PACKAGE    UL_UE_AT_LEAST(4, 26) // ForEachObjectWithPackage
+#define UL_UE_HAS_UFIELD_GET_PACKAGE            UL_UE_AT_LEAST(4, 26) // UField::GetPackage
+#define UL_UE_HAS_FSPAWN_OVERRIDE_PACKAGE       UL_UE_AT_LEAST(4, 26) // FActorSpawnParameters OverridePackage 等
+#define UL_UE_HAS_EKEYS_MOUSE2D                 UL_UE_AT_LEAST(4, 26) // EKeys::Mouse2D
+#define UL_UE_HAS_STATIC_CONSTRUCT_OBJECT_PARAMS UL_UE_AT_LEAST(4, 26) // FStaticConstructObjectParameters
+#define UL_UE_HAS_BLUEPRINT_EDITORS_LIST        UL_UE_AT_LEAST(4, 26) // FBlueprintEditorModule::GetBlueprintEditors
+#define UL_UE_HAS_LWC                           UL_UE_AT_LEAST(5, 0)  // Large World Coordinates：unluaReal=double；FVector4/FQuat 模板
+#define UL_UE_HAS_SCRIPTARRAY_ALIGNMENT         UL_UE_AT_LEAST(5, 0)  // FScriptArray::Empty/Add 对齐参数
+#define UL_UE_HAS_OBJECT_IS_VALID               UL_UE_AT_LEAST(5, 0)  // IsValid() 替代 IsPendingKill()
+#define UL_UE_HAS_TOOLMENUS_LEVEL_EDITOR_USER   UL_UE_AT_LEAST(5, 0)  // LevelEditor.LevelEditorToolBar.User
+#define UL_UE_HAS_GAME_RELOAD_UNLUA_INI         UL_UE_AT_LEAST(5, 0)  // 非 Editor 打包需强制 ReloadConfig UnLua.ini
 #define UL_UE_HAS_PACKAGE_SAVE_CONTEXT         UL_UE_AT_LEAST(5, 0)  // PreSavePackageWithContextEvent / ObjectSaveContext
 #define UL_UE_HAS_TRY_UPDATE_DEFAULT_CONFIG     UL_UE_AT_LEAST(5, 0)  // UpdateDefaultConfigFile → TryUpdateDefaultConfigFile
 #define UL_UE_HAS_COREDELEGATES_GET_POST_ENGINE_INIT UL_UE_AT_LEAST(5, 8) // OnPostEngineInit → GetOnPostEngineInit()

@@ -15,8 +15,9 @@
 #pragma once
 
 #include "LuaContainerInterface.h"
+#include "UnLuaVersionCompat.h"
 
-#if ENGINE_MAJOR_VERSION >=5
+#if UL_UE_HAS_SCRIPTARRAY_ALIGNMENT
 #define ALIGNMENT_PLACEHOLDER ,__STDCPP_DEFAULT_NEW_ALIGNMENT__ 
 #else
 #define ALIGNMENT_PLACEHOLDER

@@ -19,11 +19,7 @@ public class UnLuaEditor : ModuleRules
 {
     public UnLuaEditor(ReadOnlyTargetRules Target) : base(Target)
     {
-#if UE_5_2_OR_LATER
-        IWYUSupport = IWYUSupport.None;
-#else
-        bEnforceIWYU = false;
-#endif
+        UnLuaVersionCompat.DisableIwyu(this);
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -63,9 +59,6 @@ public class UnLuaEditor : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "UnrealEd",
-#if UE_5_0_OR_LATER
-                "DeveloperToolSettings",
-#endif
                 "EditorStyle",
                 "ApplicationCore",
                 "Projects",
@@ -83,6 +76,9 @@ public class UnLuaEditor : ModuleRules
                 "ToolMenus"
             }
         );
+
+        if (UnLuaVersionCompat.HasDeveloperToolSettings)
+            PrivateDependencyModuleNames.Add("DeveloperToolSettings");
 
         DynamicallyLoadedModuleNames.AddRange(
             new[]

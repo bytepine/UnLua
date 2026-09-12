@@ -15,7 +15,7 @@
 #pragma once
 
 #include "LuaArray.h"
-#include "Runtime/Launch/Resources/Version.h"
+#include "UnLuaVersionCompat.h"
 
 class FLuaMap
 {
@@ -314,7 +314,7 @@ public:
                 if (IsValidIndex(++i))
                 {
                     int32 KeyOffset = 0;
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 22
+#if !UL_UE_HAS_TMAP_GETDATA_KEY_INLINE
                     KeyOffset = MapLayout.KeyOffset;
 #endif
                     LuaArray->Add((uint8*)Map->GetData(i, MapLayout) + KeyOffset);

@@ -1,4 +1,3 @@
-#include "Misc/EngineVersionComparison.h"
 #include "UnLuaVersionCompat.h"
 #include "UnLuaCompatibility.h"
 #include "PropertyRegistry.h"

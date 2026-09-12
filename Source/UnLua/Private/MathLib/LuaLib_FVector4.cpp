@@ -105,13 +105,13 @@ static const luaL_Reg FVector4Lib[] =
     {nullptr, nullptr}
 };
 
-#if ENGINE_MAJOR_VERSION < 5
+#if !UL_UE_HAS_LWC
 float Dot3(const FVector4& V1, const FVector4& V2);
 float Dot4(const FVector4& V1, const FVector4& V2);
 #endif
 
 BEGIN_EXPORT_REFLECTED_CLASS(FVector4)
-#if ENGINE_MAJOR_VERSION < 5
+#if !UL_UE_HAS_LWC
     ADD_EXTERNAL_FUNCTION(float, Dot3, const FVector4&, const FVector4&)
     ADD_EXTERNAL_FUNCTION(float, Dot4, const FVector4&, const FVector4&)
 #else

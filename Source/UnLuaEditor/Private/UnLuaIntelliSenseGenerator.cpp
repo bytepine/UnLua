@@ -12,10 +12,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 // See the License for the specific language governing permissions and limitations under the License.
 
-#include "Misc/EngineVersionComparison.h"
 #include "UnLuaVersionCompat.h"
 #include "UnLuaIntelliSenseGenerator.h"
-#if UE_VERSION_NEWER_THAN(5, 1, 0)
+#if UL_UE_HAS_ASSETREGISTRY_NESTED_HEADER
 #include "AssetRegistry/AssetRegistryModule.h"
 #else
 #include "AssetRegistryModule.h"
@@ -61,7 +60,7 @@ void FUnLuaIntelliSenseGenerator::UpdateAll()
     const FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
     FARFilter Filter;
-#if UE_VERSION_OLDER_THAN(5, 1, 0)
+#if !UL_UE_HAS_CLASS_PATHS
     Filter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
     Filter.ClassNames.Add(UWidgetBlueprint::StaticClass()->GetFName());
 #else
@@ -109,7 +108,7 @@ void FUnLuaIntelliSenseGenerator::UpdateAll()
 
 bool FUnLuaIntelliSenseGenerator::IsBlueprint(const FAssetData& AssetData)
 {
-#if UE_VERSION_OLDER_THAN(5, 1, 0)
+#if !UL_UE_HAS_CLASS_PATHS
     const FName AssetClass = AssetData.AssetClass;
     return AssetClass == UBlueprint::StaticClass()->GetFName() || AssetClass == UWidgetBlueprint::StaticClass()->GetFName();
 #else
@@ -148,7 +147,7 @@ void FUnLuaIntelliSenseGenerator::Export(const UBlueprint* Blueprint)
 
 void FUnLuaIntelliSenseGenerator::Export(const UField* Field)
 {
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 26)
+#if UL_UE_HAS_UFIELD_GET_PACKAGE
     const UPackage* Package = Field->GetPackage();
 #else
     const UPackage* Package = (UPackage*)Field->GetTypedOuter(UPackage::StaticClass());

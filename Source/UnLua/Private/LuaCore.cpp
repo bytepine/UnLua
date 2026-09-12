@@ -666,7 +666,7 @@ static void PushDelegateElement(lua_State *L, FDelegateProperty *Property, void 
  */
 static void PushMCDelegateElement(lua_State *L, FMulticastDelegateProperty *Property, void *Value)
 {
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 23
+#if !UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
     FMulticastScriptDelegate *ScriptDelegate = Property->GetPropertyValuePtr(Value);
 #else
     void *ScriptDelegate = Value;

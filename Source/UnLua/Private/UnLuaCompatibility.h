@@ -16,14 +16,13 @@
 
 #include "CoreUObject.h"
 #include "../Public/UnLuaVersionCompat.h"
-#include "Misc/EngineVersionComparison.h"
 
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 19
+#if !UL_UE_HAS_DEFINE_FUNCTION_MACRO
 #define DEFINE_FUNCTION(func) void func( FFrame& Stack, RESULT_DECL )
 #define FNativeFuncPtr Native
 #endif
 
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 20
+#if !UL_UE_HAS_INPUT_ACTION_GETTERS
 #define EPropertyFlags uint64
 #define GET_INPUT_ACTION_NAME(IAB) IAB.ActionName
 #define IS_INPUT_ACTION_PAIRED(IAB) IAB.bPaired
@@ -32,7 +31,7 @@
 #define IS_INPUT_ACTION_PAIRED(IAB) IAB.IsPaired()
 #endif
 
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 25
+#if UL_UE_HAS_UPROPERTY_TYPE
 #define CastField Cast
 #define GetPropertyOuter(Property) (Property)->GetOuter()
 #define GetChildProperties(Function) (Function)->Children
@@ -68,7 +67,7 @@ typedef USetProperty FSetProperty;
 typedef UStructProperty FStructProperty;
 typedef UDelegateProperty FDelegateProperty;
 typedef UMulticastDelegateProperty FMulticastDelegateProperty;
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION > 22)
+#if UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
 typedef UMulticastInlineDelegateProperty FMulticastInlineDelegateProperty;
 typedef UMulticastSparseDelegateProperty FMulticastSparseDelegateProperty;
 #endif
@@ -77,13 +76,13 @@ typedef UMulticastSparseDelegateProperty FMulticastSparseDelegateProperty;
 #define GetChildProperties(Function) (Function)->ChildProperties
 #endif
 
-#if ENGINE_MAJOR_VERSION < 5
+#if !UL_UE_HAS_LWC
 typedef float unluaReal;
 #else
 typedef double unluaReal;
 #endif
 
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 23
+#if !UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
 typedef FMulticastScriptDelegate FMulticastDelegateType;
 #else
 typedef void FMulticastDelegateType;
@@ -96,28 +95,28 @@ struct TMulticastDelegateTraits
 
     static void AddDelegate(FMulticastDelegateProperty* Property, FScriptDelegate Delegate, UObject* Parent, void* PropertyValue)
     {
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION > 22)
+#if UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
         Property->AddDelegate(Delegate, Parent, PropertyValue);
 #endif
     }
 
     static void RemoveDelegate(FMulticastDelegateProperty* Property, FScriptDelegate Delegate, UObject* Parent, void* PropertyValue)
     {
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION > 22)
+#if UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
         Property->RemoveDelegate(Delegate, Parent, PropertyValue);
 #endif
     }
 
     static void ClearDelegate(FMulticastDelegateProperty* Property, UObject* Parent, void* PropertyValue)
     {
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION > 22)
+#if UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
         Property->ClearDelegate(Parent, PropertyValue);
 #endif
     }
 
     static FMulticastScriptDelegate* GetMulticastDelegate(FMulticastDelegateProperty* Property, void* PropertyValue)
     {
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION > 22)
+#if UL_UE_HAS_SPARSE_MULTICAST_DELEGATE
         return (FMulticastScriptDelegate*)Property->GetMulticastDelegate(PropertyValue);
 #else
         return nullptr;
@@ -154,7 +153,7 @@ struct TMulticastDelegateTraits<FMulticastScriptDelegate>
     }
 };
 
-#if UE_VERSION_OLDER_THAN(5, 1, 0)
+#if !UL_UE_HAS_FIND_FIRST_OBJECT
 
 template< class T >
 inline T* FindFirstObject(const TCHAR* Name)

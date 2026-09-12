@@ -135,7 +135,7 @@ BEGIN_EXPORT_REFLECTED_CLASS(FQuat)
     ADD_FUNCTION(IsNormalized)
     ADD_FUNCTION(Size)
     ADD_FUNCTION(SizeSquared)
-#if ENGINE_MAJOR_VERSION >=5
+#if UL_UE_HAS_LWC
     ADD_CONST_FUNCTION_EX("ToAxisAndAngle", void, TQuat::ToAxisAndAngle, UE::Math::TVector<unluaReal>&, unluaReal&)
 #else
     ADD_FUNCTION(ToAxisAndAngle)

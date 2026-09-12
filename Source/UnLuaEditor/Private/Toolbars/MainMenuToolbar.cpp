@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and limitations under the License.
 
 #include "MainMenuToolbar.h"
+#include "UnLuaVersionCompat.h"
 #include "ISettingsModule.h"
 #include "UnLuaAboutScreen.h"
 #include "UnLuaIntelliSenseGenerator.h"
@@ -81,7 +82,7 @@ FMainMenuToolbar::FMainMenuToolbar()
 
 void FMainMenuToolbar::Initialize()
 {
-#if ENGINE_MAJOR_VERSION >= 5
+#if UL_UE_HAS_TOOLMENUS_LEVEL_EDITOR_USER
     UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.User");
     FToolMenuSection& Section = ToolbarMenu->AddSection("UnluaSettings");
     Section.AddEntry(FToolMenuEntry::InitComboButton(

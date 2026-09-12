@@ -21,11 +21,7 @@ namespace UnrealBuildTool.Rules
     {
         public UnLuaDefaultParamCollector(ReadOnlyTargetRules Target) : base(Target)
         {
-#if UE_5_2_OR_LATER
-        IWYUSupport = IWYUSupport.None;
-#else
-        bEnforceIWYU = false;
-#endif
+            UnLuaVersionCompat.DisableIwyu(this);
 
             PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 

@@ -485,7 +485,7 @@ namespace UnLua
                     // UClass
                     FClassProperty *ClassProperty = (FClassProperty*)ObjectProperty;
                     UClass *Class = Cast<UClass>(ObjectProperty->GetPropertyValue(ValuePtr));
-#if UE_VERSION_OLDER_THAN(5, 3, 0)
+#if !UL_UE_HAS_TOBJECTPTR_FIELD_GET
                     UClass *MetaClass = Class ? Class : ClassProperty->MetaClass;
 #else
                     UClass *MetaClass = Class ? Class : ClassProperty->MetaClass.Get();
@@ -503,7 +503,7 @@ namespace UnLua
                 {
                     // UObject
                     UObject *Object = ObjectProperty->GetPropertyValue(ValuePtr);
-#if UE_VERSION_OLDER_THAN(5, 3, 0)
+#if !UL_UE_HAS_TOBJECTPTR_FIELD_GET
                     UClass *Class = Object ? Object->GetClass() : ObjectProperty->PropertyClass;
 #else
                     UClass *Class = Object ? Object->GetClass() : ObjectProperty->PropertyClass.Get();

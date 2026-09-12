@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+// using 必须跟 UBT 预处理器（类型不存在）；语义分叉见 UnLuaVersionCompat
 #if UE_5_0_OR_LATER
 using EpicGames.Core;
 #else
@@ -31,16 +32,7 @@ public class Lua : ModuleRules
     public Lua(ReadOnlyTargetRules Target) : base(Target)
     {
         Type = ModuleType.External;
-#if UE_5_6_OR_LATER
-        CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
-        CppCompileWarningSettings.ShadowVariableWarningLevel = WarningLevel.Off;
-#elif UE_5_5_OR_LATER
-        UndefinedIdentifierWarningLevel = WarningLevel.Off;
-        ShadowVariableWarningLevel = WarningLevel.Off;
-#else
-        bEnableUndefinedIdentifierWarnings = false;
-        ShadowVariableWarningLevel = WarningLevel.Off;
-#endif
+        UnLuaVersionCompat.ApplyExternalModuleCompileWarnings(this);
 
         m_LuaVersion = GetLuaVersion();
         m_Config = GetConfigName();
@@ -122,16 +114,7 @@ public class Lua : ModuleRules
 
     private IAndroidToolChain GetAndroidToolChain()
     {
-#if UE_5_2_OR_LATER
-        var ueBuildPlatformType = Assembly.GetAssembly(typeof(IAndroidToolChain)).GetType("UnrealBuildTool.UEBuildPlatform");
-        var getBuildPlatformMethod = ueBuildPlatformType.GetMethod("GetBuildPlatform", BindingFlags.Static | BindingFlags.Public);
-        var androidBuildPlatform = getBuildPlatformMethod.Invoke(null, new object[] { UnrealTargetPlatform.Android });
-        var createTempToolChainForProjectMethod = androidBuildPlatform.GetType().GetMethod("CreateTempToolChainForProject");
-        var toolchain = (IAndroidToolChain)createTempToolChainForProjectMethod.Invoke(androidBuildPlatform, new object[] { Target.ProjectFile });
-#else
-        var toolchain = AndroidExports.CreateToolChain(Target.ProjectFile);
-#endif
-        return toolchain;
+        return UnLuaVersionCompat.CreateAndroidToolChain(Target);
     }
 
     private void BuildForLinux()
@@ -196,11 +179,7 @@ public class Lua : ModuleRules
 
     private void BuildForMac()
     {
-#if UE_5_2_OR_LATER
-        var abiName = Target.Architecture.ToString();
-#else
-        var abiName = Target.Architecture;
-#endif
+        var abiName = UnLuaVersionCompat.GetArchitectureString(Target);
         var libFile = GetLibraryPath(abiName);
         if (!File.Exists(libFile))
         {
@@ -450,18 +429,9 @@ public class Lua : ModuleRules
                 return "Ninja";
             if (Target.Platform.IsInGroup(UnrealPlatformGroup.Windows))
             {
-#if !UE_5_4_OR_LATER
-                if (Target.WindowsPlatform.Compiler == WindowsCompiler.VisualStudio2019)
-                    return "Visual Studio 16 2019";
-#endif
-#if UE_4_27_OR_LATER
-                if (Target.WindowsPlatform.Compiler == WindowsCompiler.VisualStudio2022)
-                    return "Visual Studio 17 2022";
-#endif
-#if UE_5_8_OR_LATER
-                if (Target.WindowsPlatform.Compiler == WindowsCompiler.VisualStudio2026)
-                    return "Visual Studio 18 2026";
-#endif
+                var generator = UnLuaVersionCompat.GetWindowsCMakeGenerator(Target);
+                if (generator != null)
+                    return generator;
             }
         }
 

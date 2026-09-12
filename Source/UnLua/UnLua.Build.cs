@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+// using 必须跟 UBT 预处理器（类型不存在）；语义分叉见 UnLuaVersionCompat
 #if UE_5_0_OR_LATER
 using EpicGames.Core;
 #else
@@ -25,11 +26,7 @@ public class UnLua : ModuleRules
 {
     public UnLua(ReadOnlyTargetRules Target) : base(Target)
     {
-#if UE_5_2_OR_LATER
-        IWYUSupport = IWYUSupport.None;
-#else
-        bEnforceIWYU = false;
-#endif
+        UnLuaVersionCompat.DisableIwyu(this);
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
@@ -124,5 +121,86 @@ public class UnLua : ModuleRules
         }
 
         return false;
+    }
+}
+
+/// <summary>
+/// C# 跨版本入口（对齐 UnLuaVersionCompat.h）。版本号 / UE_*_OR_LATER 只允许出现在本类型内。
+/// UBT 编译 Build.cs 时 using 必须跟预处理器（类型不存在），见各 Build.cs 文件头。
+/// </summary>
+public static class UnLuaVersionCompat
+{
+    public static void DisableIwyu(ModuleRules Module)
+    {
+#if UE_5_2_OR_LATER
+        Module.IWYUSupport = IWYUSupport.None;
+#else
+        Module.bEnforceIWYU = false;
+#endif
+    }
+
+    public static void ApplyExternalModuleCompileWarnings(ModuleRules Module)
+    {
+#if UE_5_6_OR_LATER
+        Module.CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
+        Module.CppCompileWarningSettings.ShadowVariableWarningLevel = WarningLevel.Off;
+#elif UE_5_5_OR_LATER
+        Module.UndefinedIdentifierWarningLevel = WarningLevel.Off;
+        Module.ShadowVariableWarningLevel = WarningLevel.Off;
+#else
+        Module.bEnableUndefinedIdentifierWarnings = false;
+        Module.ShadowVariableWarningLevel = WarningLevel.Off;
+#endif
+    }
+
+    public static bool HasDeveloperToolSettings
+    {
+        get
+        {
+#if UE_5_0_OR_LATER
+            return true;
+#else
+            return false;
+#endif
+        }
+    }
+
+    public static IAndroidToolChain CreateAndroidToolChain(ReadOnlyTargetRules Target)
+    {
+#if UE_5_2_OR_LATER
+        var ueBuildPlatformType = System.Reflection.Assembly.GetAssembly(typeof(IAndroidToolChain)).GetType("UnrealBuildTool.UEBuildPlatform");
+        var getBuildPlatformMethod = ueBuildPlatformType.GetMethod("GetBuildPlatform", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+        var androidBuildPlatform = getBuildPlatformMethod.Invoke(null, new object[] { UnrealTargetPlatform.Android });
+        var createTempToolChainForProjectMethod = androidBuildPlatform.GetType().GetMethod("CreateTempToolChainForProject");
+        return (IAndroidToolChain)createTempToolChainForProjectMethod.Invoke(androidBuildPlatform, new object[] { Target.ProjectFile });
+#else
+        return AndroidExports.CreateToolChain(Target.ProjectFile);
+#endif
+    }
+
+    public static string GetArchitectureString(ReadOnlyTargetRules Target)
+    {
+#if UE_5_2_OR_LATER
+        return Target.Architecture.ToString();
+#else
+        return Target.Architecture;
+#endif
+    }
+
+    public static string GetWindowsCMakeGenerator(ReadOnlyTargetRules Target)
+    {
+#if !UE_5_4_OR_LATER
+        if (Target.WindowsPlatform.Compiler == WindowsCompiler.VisualStudio2019)
+            return "Visual Studio 16 2019";
+#endif
+#if UE_4_27_OR_LATER
+        if (Target.WindowsPlatform.Compiler == WindowsCompiler.VisualStudio2022)
+            return "Visual Studio 17 2022";
+#endif
+#if UE_5_8_OR_LATER
+        if (Target.WindowsPlatform.Compiler == WindowsCompiler.VisualStudio2026)
+            return "Visual Studio 18 2026";
+#endif
+        return null;
     }
 }

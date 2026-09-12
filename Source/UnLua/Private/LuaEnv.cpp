@@ -323,7 +323,7 @@ namespace UnLua
             if (!InputComponent->IsRegistered())
                 continue;
 
-#if ENGINE_MAJOR_VERSION >=5
+#if UL_UE_HAS_OBJECT_IS_VALID
             if (!IsValid(InputComponent))
                 continue;
 #else

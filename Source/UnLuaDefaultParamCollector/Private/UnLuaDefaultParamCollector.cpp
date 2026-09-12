@@ -359,7 +359,7 @@ public:
                     else if (Property->IsA(FTextProperty::StaticClass())) // FText
                     {
                         PreAddProperty(Class, Function);
-#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION > 20)
+#if UL_UE_HAS_INVTEXT_DEFAULT_PARAM
                         if (ValueStr.StartsWith(TEXT("INVTEXT(\"")))
                         {
                             GeneratedFileContent += FString::Printf(TEXT("PC->Parameters.Add(TEXT(\"%s\"), new FTextParamValue(%s));\r\n"), *Property->GetName(), *ValueStr);

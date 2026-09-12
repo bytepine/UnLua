@@ -12,9 +12,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 // See the License for the specific language governing permissions and limitations under the License.
 
+#include "UnLuaVersionCompat.h"
 #include "UObject/UObjectHash.h"
 
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 26
+#if !UL_UE_HAS_FOREACH_OBJECT_WITH_PACKAGE
 void ForEachObjectWithPackage(const class UPackage* Package, TFunctionRef<bool(UObject*)> Operation, bool bIncludeNestedObjects, EObjectFlags ExclusionFlags, EInternalObjectFlags ExclusionInternalFlags)
 {
     check(Package != nullptr);
