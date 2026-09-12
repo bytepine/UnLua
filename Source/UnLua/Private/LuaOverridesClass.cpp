@@ -14,7 +14,7 @@
 
 #include "LuaOverridesClass.h"
 #include "LuaFunction.h"
-#include "Misc/EngineVersionComparison.h"
+#include "UnLuaVersionCompat.h"
 
 ULuaOverridesClass* ULuaOverridesClass::Create(UClass* Class)
 {
@@ -22,7 +22,11 @@ ULuaOverridesClass* ULuaOverridesClass::Create(UClass* Class)
     auto ClassName = MakeUniqueObjectName(GetTransientPackage(), Class, FName(*ClassNameString));
     auto Ret = NewObject<ULuaOverridesClass>(GetTransientPackage(), ClassName, RF_Public | RF_Transient);
     Ret->ClassFlags |= CLASS_NewerVersionExists; // bypass FBlueprintActionDatabase::RefreshClassActions
+#if UL_UE_HAS_UCLASS_SET_DEFAULT_OBJECT
+    Ret->SetDefaultObject(StaticClass()->GetDefaultObject());
+#else
     Ret->ClassDefaultObject = StaticClass()->GetDefaultObject();
+#endif
     Ret->SetSuperStruct(StaticClass());
     Ret->Bind();
     Ret->Owner = Class;
@@ -67,7 +71,7 @@ void ULuaOverridesClass::AddToOwner()
     if (!Class)
         return;
 
-#if UE_VERSION_NEWER_THAN(5, 2, 0)
+#if UL_UE_HAS_USTRUCT_CHILDREN_TOBJECTPTR
     auto ChildrenPtr = Class->Children.Get();
 
     auto Field = &ChildrenPtr;
@@ -81,7 +85,11 @@ void ULuaOverridesClass::AddToOwner()
             Field = nullptr;
             break;
         }
+#if UL_UE_HAS_UFIELD_NEXT_TOBJECTPTR
+        Field = (UField**)&((*Field)->Next);
+#else
         Field = &(*Field)->Next;
+#endif
     }
 
     if (Field)
@@ -97,7 +105,7 @@ void ULuaOverridesClass::RemoveFromOwner()
     if (!Class)
         return;
 
-#if UE_VERSION_NEWER_THAN(5, 2, 0)
+#if UL_UE_HAS_USTRUCT_CHILDREN_TOBJECTPTR
     auto ChildrenPtr = Class->Children.Get();
 
     auto Field = &ChildrenPtr;
@@ -111,7 +119,11 @@ void ULuaOverridesClass::RemoveFromOwner()
             *Field = nullptr;
             break;
         }
+#if UL_UE_HAS_UFIELD_NEXT_TOBJECTPTR
+        Field = (UField**)&((*Field)->Next);
+#else
         Field = &(*Field)->Next;
+#endif
     }
 
     if (!Class->IsRooted() && !GUObjectArray.IsDisregardForGC(Class))

@@ -14,8 +14,9 @@
 
 #pragma once
 
+#include "UnLuaVersionCompat.h"
 #include "UObject/UObjectHash.h"
 
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 26
+#if !UL_UE_HAS_FOREACH_OBJECT_WITH_PACKAGE
 void ForEachObjectWithPackage(const class UPackage* Outer, TFunctionRef<bool(UObject*)> Operation, bool bIncludeNestedObjects = true, EObjectFlags ExclusionFlags = RF_NoFlags, EInternalObjectFlags ExclusionInternalFlags = EInternalObjectFlags::None);
 #endif

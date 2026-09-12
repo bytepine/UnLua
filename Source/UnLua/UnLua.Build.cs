@@ -32,16 +32,12 @@ public class UnLua : ModuleRules
 #endif
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicIncludePaths.AddRange(
-            new string[]
-            {
-            }
-        );
-
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
         PrivateIncludePaths.AddRange(
             new[]
             {
                 "UnLua/Private",
+                Path.Combine(ModuleDirectory, "Public"),
             }
         );
 

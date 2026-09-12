@@ -15,6 +15,7 @@
 #include "FunctionDesc.h"
 #include "PropertyDesc.h"
 #include "LuaCore.h"
+#include "UnLuaVersionCompat.h"
 #include "DefaultParamCollection.h"
 #include "LowLevel.h"
 #include "LuaFunction.h"
@@ -268,7 +269,11 @@ void FFunctionDesc::BroadcastMulticastDelegate(lua_State *L, int32 NumParams, in
     FFlagArray CleanupFlags;
     const auto Params = Buffer->Get();
     PreCall(L, NumParams, FirstParamIndex, CleanupFlags, Params);
+#if UL_UE_HAS_MULTICAST_PROCESS_DELEGATE
+    ScriptDelegate->ProcessDelegate<UObject>(Params);
+#else
     ScriptDelegate->ProcessMulticastDelegate<UObject>(Params);
+#endif
     PostCall(L, NumParams, FirstParamIndex, Params, CleanupFlags);      // !!! have no return values for multi-cast delegates
     Buffer->Pop(Params);
 }

@@ -795,7 +795,7 @@ public:
             {
                 if (!bCopyValue && Property->HasAnyPropertyFlags(CPF_OutParm))
                 {
-                    if (Src->ElementSize < ArrayProperty->Inner->ElementSize)
+                    if (Src->ElementSize < UL_GET_PROPERTY_ELEMENT_SIZE(ArrayProperty->Inner))
                     {
                         FScriptArrayHelper Helper(ArrayProperty, ValuePtr);
                         if (Src->Num() > 0)

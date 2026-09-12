@@ -15,7 +15,7 @@
 #pragma once
 
 #include "CoreUObject.h"
-#include "Misc/EngineVersionComparison.h"
+#include "UnLuaVersionCompat.h"
 #include <type_traits>
 
 namespace UnLua
@@ -43,10 +43,10 @@ namespace UnLua
     {
         enum
         {
-#if UE_VERSION_OLDER_THAN(5, 2, 0)
-            Value = TIsSame<decltype(FHasEqualityOperatorImpl::Identical<T1, T2>(nullptr)), bool>::Value
-#else
+#if UL_UE_HAS_STD_IS_SAME_V
             Value = std::is_same_v<decltype(FHasEqualityOperatorImpl::Identical<T1, T2>(nullptr)), bool>
+#else
+            Value = TIsSame<decltype(FHasEqualityOperatorImpl::Identical<T1, T2>(nullptr)), bool>::Value
 #endif
         };
     };
@@ -91,7 +91,7 @@ namespace UnLua
     template <typename T> struct TArgTypeTraits
     {
         typedef typename TDecay<T>::Type RT;
-        typedef typename TChooseClass<TIsPrimitiveTypeOrPointer<RT>::Value, RT, typename std::remove_cv<T>::type>::Result Type;
+        typedef std::conditional_t<TIsPrimitiveTypeOrPointer<RT>::Value, RT, typename std::remove_cv<T>::type> Type;
     };
     
     

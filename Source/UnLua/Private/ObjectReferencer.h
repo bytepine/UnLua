@@ -16,6 +16,10 @@
 
 #include "Containers/Set.h"
 #include "UObject/GCObject.h"
+#include "UnLuaVersionCompat.h"
+#if UL_UE_HAS_REFCOLLECTOR_TOBJECTPTR
+#include "UObject/ObjectPtr.h"
+#endif
 
 namespace UnLua
 {
@@ -58,7 +62,11 @@ namespace UnLua
         }
 
     private:
+#if UL_UE_HAS_REFCOLLECTOR_TOBJECTPTR
+        TSet<TObjectPtr<UObject>> ReferencedObjects;
+#else
         TSet<UObject*> ReferencedObjects;
+#endif
         FString Name = TEXT("FObjectReferencer");
     };
 }

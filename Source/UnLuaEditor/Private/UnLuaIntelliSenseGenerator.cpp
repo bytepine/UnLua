@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and limitations under the License.
 
 #include "Misc/EngineVersionComparison.h"
+#include "UnLuaVersionCompat.h"
 #include "UnLuaIntelliSenseGenerator.h"
 #if UE_VERSION_NEWER_THAN(5, 1, 0)
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -283,7 +284,11 @@ void FUnLuaIntelliSenseGenerator::OnAssetUpdated(const FAssetData& AssetData)
     if (!ShouldExport(AssetData, true))
         return;
 
+#if UL_UE_HAS_ASSET_SOFT_OBJECT_PATH
+    UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *AssetData.GetObjectPathString());
+#else
     UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *AssetData.ObjectPath.ToString());
+#endif
     if (!Blueprint)
         return;
 

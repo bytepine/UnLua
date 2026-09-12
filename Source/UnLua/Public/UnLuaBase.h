@@ -16,11 +16,12 @@
 
 #include "CoreUObject.h"
 #include "Runtime/Launch/Resources/Version.h"
+#include "UnLuaVersionCompat.h"
 
 UNLUA_API DECLARE_LOG_CATEGORY_EXTERN(LogUnLua, Log, All);
 UNLUA_API DECLARE_LOG_CATEGORY_EXTERN(UnLuaDelegate, Log, All);
 
-#if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 25
+#if UL_UE_HAS_UPROPERTY_TYPE
 typedef UProperty FProperty;
 #endif
 

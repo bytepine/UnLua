@@ -17,8 +17,8 @@
 #include "LuaOverrides.h"
 #include "LuaOverridesClass.h"
 #include "UnLuaModule.h"
+#include "UnLuaVersionCompat.h"
 #include "ReflectionUtils/PropertyDesc.h"
-#include "Misc/EngineVersionComparison.h"
 
 static constexpr uint8 ScriptMagicHeader[] = {EX_StringConst, 'L', 'U', 'A', '\0', EX_UInt64Const};
 static constexpr size_t ScriptMagicHeaderSize = sizeof ScriptMagicHeader;
@@ -141,7 +141,11 @@ void ULuaFunction::Override(UFunction* Function, UClass* Class, bool bAddNew)
     check(Function && Class && !From.IsValid());
 
 #if WITH_METADATA
+#if UL_UE_HAS_FMETADATA_COPY
+    FMetaData::CopyMetadata(Function, this);
+#else
     UMetaData::CopyMetadata(Function, this);
+#endif
 #endif
 
     bActivated = false;
@@ -286,7 +290,7 @@ void ULuaFunction::Bind()
     }
     else
     {
-#if UE_VERSION_NEWER_THAN(5, 2, 0)
+#if UL_UE_HAS_UFUNCTION_SUPER_BIND
         Super::Bind();
 #else
         SetNativeFunc(ProcessInternal);

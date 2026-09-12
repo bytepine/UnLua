@@ -29,9 +29,11 @@ extern "C" {
 #endif
 #endif
 
+#include "UnLuaLuaInternalBegin.h"
 #include "lfunc.h"
 #include "lstate.h"
 #include "lobject.h"
+#include "UnLuaLuaInternalEnd.h"
 
 #ifdef __cplusplus
 #if !LUA_COMPILE_AS_CPP
@@ -711,7 +713,7 @@ template <typename T, bool WithMetaTableName>
 static void PushPropertyArray(lua_State *L, T *Property, void *Value, void(*PushFunc)(lua_State*, T*, void*), const char *MetatableName = nullptr)
 {
 #if !UE_BUILD_SHIPPING
-    if (!Property || !Value || Property->ArrayDim < 2 || Property->ElementSize < 1)
+    if (!Property || !Value || Property->ArrayDim < 2 || UL_GET_PROPERTY_ELEMENT_SIZE(Property) < 1)
     {
         UNLUA_LOGERROR(L, LogUnLua, Warning, TEXT("%s, Invalid parameters!"), ANSI_TO_TCHAR(__FUNCTION__));
         return;
@@ -739,7 +741,7 @@ static void PushPropertyArray(lua_State *L, T *Property, void *Value, void(*Push
         {
             lua_pushinteger(L, i + 1);
             PushFunc(L, Property, ElementPtr);
-            ElementPtr += Property->ElementSize;
+            ElementPtr += UL_GET_PROPERTY_ELEMENT_SIZE(Property);
             TPropertyArrayPushPolicy<T, WithMetaTableName>::PostPushSingleElement(L);
         }
         TPropertyArrayPushPolicy<T, WithMetaTableName>::PostPushArray(L);

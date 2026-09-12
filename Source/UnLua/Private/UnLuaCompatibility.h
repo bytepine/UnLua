@@ -15,7 +15,7 @@
 #pragma once
 
 #include "CoreUObject.h"
-#include "Runtime/Launch/Resources/Version.h"
+#include "../Public/UnLuaVersionCompat.h"
 #include "Misc/EngineVersionComparison.h"
 
 #if ENGINE_MAJOR_VERSION <= 4 && ENGINE_MINOR_VERSION < 19

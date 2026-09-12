@@ -32,7 +32,7 @@
 #include "Toolbars/AnimationBlueprintToolbar.h"
 #include "Toolbars/BlueprintToolbar.h"
 #include "Toolbars/MainMenuToolbar.h"
-#if ENGINE_MAJOR_VERSION > 4
+#if UL_UE_HAS_PACKAGE_SAVE_CONTEXT
 #include "UObject/ObjectSaveContext.h"
 #endif
 
@@ -51,7 +51,11 @@ public:
 
         FUnLuaEditorCommands::Register();
 
+#if UL_UE_HAS_COREDELEGATES_GET_POST_ENGINE_INIT
+        FCoreDelegates::GetOnPostEngineInit().AddRaw(this, &FUnLuaEditorModule::OnPostEngineInit);
+#else
         FCoreDelegates::OnPostEngineInit.AddRaw(this, &FUnLuaEditorModule::OnPostEngineInit);
+#endif
 
         MainMenuToolbar = MakeShareable(new FMainMenuToolbar);
         BlueprintToolbar = MakeShareable(new FBlueprintToolbar);
@@ -59,7 +63,7 @@ public:
 
         UUnLuaEditorFunctionLibrary::WatchScriptDirectory();
 
-#if ENGINE_MAJOR_VERSION > 4
+#if UL_UE_HAS_PACKAGE_SAVE_CONTEXT
         UPackage::PreSavePackageWithContextEvent.AddRaw(this, &FUnLuaEditorModule::OnPackageSavingWithContext);
         UPackage::PackageSavedWithContextEvent.AddRaw(this, &FUnLuaEditorModule::OnPackageSavedWithContext);
 #else
@@ -72,10 +76,14 @@ public:
     virtual void ShutdownModule() override
     {
         FUnLuaEditorCommands::Unregister();
+#if UL_UE_HAS_COREDELEGATES_GET_POST_ENGINE_INIT
+        FCoreDelegates::GetOnPostEngineInit().RemoveAll(this);
+#else
         FCoreDelegates::OnPostEngineInit.RemoveAll(this);
+#endif
         UnregisterSettings();
 
-#if ENGINE_MAJOR_VERSION > 4
+#if UL_UE_HAS_PACKAGE_SAVE_CONTEXT
         UPackage::PreSavePackageWithContextEvent.RemoveAll(this);
         UPackage::PackageSavedWithContextEvent.RemoveAll(this);
 #else
@@ -140,7 +148,7 @@ private:
         return true;
     }
 
-#if ENGINE_MAJOR_VERSION > 4
+#if UL_UE_HAS_PACKAGE_SAVE_CONTEXT
     void OnPackageSavingWithContext(UPackage* Package, FObjectPreSaveContext Context)
     {
         OnPackageSaving(Package);
@@ -164,7 +172,11 @@ private:
                 return true;
             SuspendedPackages.Add(Package, Class);
             return false;
+#if UL_UE_HAS_FOREACH_OBJECT_GETOBJECTS_FLAGS
+        }, EGetObjectsFlags::None);
+#else
         }, false);
+#endif
 
         for (const auto Pair : SuspendedPackages)
             ULuaFunction::SuspendOverrides(Pair.Value);
@@ -230,7 +242,7 @@ private:
 
         if (bModified)
         {
-#if ENGINE_MAJOR_VERSION >= 5
+#if UL_UE_HAS_TRY_UPDATE_DEFAULT_CONFIG
             PackagingSettings->TryUpdateDefaultConfigFile();
 #else
             PackagingSettings->UpdateDefaultConfigFile();

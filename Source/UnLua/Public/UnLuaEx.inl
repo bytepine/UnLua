@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and limitations under the License.
 
 #include "UnLuaDebugBase.h"
+#include <type_traits>
 
 namespace UnLua
 {
@@ -208,7 +209,7 @@ namespace UnLua
         static int32 Invoke(lua_State *L, const TFunction<RetType(ArgType...)> &Func, TTuple<typename TArgTypeTraits<ArgType>::Type...> &Args, TIndices<N...> ParamIndices)
         {
             int32 Num = 0;
-            typename TRemoveConst<RetType>::Type *RetValPtr = lua_gettop(L) > sizeof...(ArgType) ? UnLua::Get(L, sizeof...(ArgType) + 1, TType<typename TRemoveConst<RetType>::Type*>()) : nullptr;
+            typename std::remove_const_t<RetType> *RetValPtr = lua_gettop(L) > sizeof...(ArgType) ? UnLua::Get(L, sizeof...(ArgType) + 1, TType<std::remove_const_t<RetType>*>()) : nullptr;
             if (RetValPtr)
             {
                 *RetValPtr = UnLua::Invoke(Func, Args, typename TZeroBasedIndices<sizeof...(ArgType)>::Type());

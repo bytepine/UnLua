@@ -29,11 +29,17 @@
 #include "UnLuaLegacy.h"
 #include "UnLuaLib.h"
 #include "UnLuaSettings.h"
+#include "UnLuaLuaInternalBegin.h"
 #include "lstate.h"
+#include "UnLuaLuaInternalEnd.h"
 
 namespace UnLua
 {
+#if UL_UE_HAS_EINTERNAL_ASYNC_LOADING_MACRO
+    constexpr EInternalObjectFlags AsyncObjectFlags = EInternalObjectFlags_AsyncLoading | EInternalObjectFlags::Async;
+#else
     constexpr EInternalObjectFlags AsyncObjectFlags = EInternalObjectFlags::AsyncLoading | EInternalObjectFlags::Async;
+#endif
 
     TMap<lua_State*, FLuaEnv*> FLuaEnv::AllEnvs;
     FLuaEnv::FOnCreated FLuaEnv::OnCreated;
