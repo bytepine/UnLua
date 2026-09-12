@@ -18,10 +18,12 @@
 #include "LuaOverridesClass.h"
 #include "UnLuaModule.h"
 #include "UnLuaVersionCompat.h"
+#include "UObject/ObjectKey.h"
 #include "ReflectionUtils/PropertyDesc.h"
 
 static constexpr uint8 ScriptMagicHeader[] = {EX_StringConst, 'L', 'U', 'A', '\0', EX_UInt64Const};
 static constexpr size_t ScriptMagicHeaderSize = sizeof ScriptMagicHeader;
+static_assert(sizeof(FObjectKey) == 8, "Script 魔数头操作数宽度按 8 字节布局");
 
 DEFINE_FUNCTION(ULuaFunction::execCallLua)
 {
@@ -58,7 +60,7 @@ ULuaFunction* ULuaFunction::Get(UFunction* Function)
     if (LuaFunction)
         return LuaFunction;
 
-    if (Function->Script.Num() < ScriptMagicHeaderSize + sizeof(ULuaFunction*))
+    if (Function->Script.Num() < ScriptMagicHeaderSize + sizeof(FObjectKey))
         return nullptr;
 
     const auto Data = Function->Script.GetData();
@@ -68,7 +70,8 @@ ULuaFunction* ULuaFunction::Get(UFunction* Function)
     if (FPlatformMemory::Memcmp(Data, ScriptMagicHeader, ScriptMagicHeaderSize) != 0)
         return nullptr;
 
-    return FPlatformMemory::ReadUnaligned<ULuaFunction*>(Data + ScriptMagicHeaderSize);
+    const FObjectKey Key = FPlatformMemory::ReadUnaligned<FObjectKey>(Data + ScriptMagicHeaderSize);
+    return Cast<ULuaFunction>(Key.ResolveObjectPtr());
 }
 
 bool ULuaFunction::IsOverridable(const UFunction* Function)
@@ -237,10 +240,10 @@ void ULuaFunction::SetActive(const bool bActive)
             Function->SetNativeFunc(&execScriptCallLua);
             Function->GetOuterUClass()->AddNativeFunction(*Function->GetName(), &execScriptCallLua);
             Function->Script.Empty();
-            Function->Script.AddUninitialized(ScriptMagicHeaderSize + sizeof(ULuaFunction*));
+            Function->Script.AddUninitialized(ScriptMagicHeaderSize + sizeof(FObjectKey));
             const auto Data = Function->Script.GetData();
             FPlatformMemory::Memcpy(Data, ScriptMagicHeader, ScriptMagicHeaderSize);
-            FPlatformMemory::WriteUnaligned<ULuaFunction*>(Data + ScriptMagicHeaderSize, this);
+            FPlatformMemory::WriteUnaligned<FObjectKey>(Data + ScriptMagicHeaderSize, FObjectKey(this));
         }
     }
     else

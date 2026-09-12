@@ -24,3 +24,4 @@
 - `FClassRegistry::Unregister` 摘除 C++ 侧索引，失效 desc 进墓地列表（Lua 闭包 upvalue 仍可能持有指针）；`PushMetatable` 对 `UScriptStruct` 同样反注册失效 metatable；`~FLuaEnv` 先摘 `GUObjectArray` 监听
 - `TSmartPtrConstructor` 日志 `%s` 误对 `TType::GetName()`（`const char*`）解引用，改为 `UTF8_TO_TCHAR`
 - 就地覆写路径用 `ULuaFunction::Get` 去重，避免多 env 重复登记；UE 5.3+ `ULuaOverridesClass::AddToOwner`/`RemoveFromOwner` 不再把 `Children` 写进 `TObjectPtr` 局部副本
+- 覆写 `Script` 魔数头改存 `FObjectKey`，蓝图重编译 / `UnLua.HotReload` 后不再留下野指针

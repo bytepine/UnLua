@@ -19,6 +19,7 @@
 // ── 语义别名：按 API 变更点命名 ──
 
 #define UL_UE_HAS_DEFINE_FUNCTION_MACRO         UL_UE_AT_LEAST(4, 19) // DEFINE_FUNCTION / FNativeFuncPtr
+#define UL_UE_HAS_FOBJECT_KEY                   UL_UE_AT_LEAST(4, 27) // FObjectKey + ResolveObjectPtr
 #define UL_UE_HAS_INPUT_ACTION_GETTERS          UL_UE_AT_LEAST(4, 20) // FInputActionBinding::GetActionName/IsPaired
 #define UL_UE_HAS_INVTEXT_DEFAULT_PARAM         UL_UE_AT_LEAST(4, 21) // FText 默认参数 INVTEXT("...")
 #define UL_UE_HAS_TMAP_GETDATA_KEY_INLINE       UL_UE_AT_LEAST(4, 22) // TMap::GetData 已含 Key，不再加 KeyOffset
