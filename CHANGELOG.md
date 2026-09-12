@@ -12,3 +12,7 @@
 ### Added
 
 - chore: 从 [Tencent/UnLua](https://github.com/Tencent/UnLua) `Plugins/UnLua` 提取为独立插件仓（基线官方 v2.3.6；不含 UnLuaExtensions / UnLuaTestSuite / TPS 示例工程）；`LICENSE.TXT` 保留腾讯原文与 Lua 第三方声明并标明非官方提取；`README.md`；`CHANGELOG.md`（Keep a Changelog，只记相对官方 v2.3.6 的本仓改动）；`CONTRIBUTING.md`（提交信息与 CHANGELOG 同类/内容合并规范）；`UnLua.uplugin` `CreatedBy` 改为 bytepine（based on Tencent UnLua）
+
+### Fixed
+
+- 补回官方 v2.3.6 随插件分发的 Lua 5.4.3 各平台预编译库（`lib-c` / `lib-cpp` 的 `.a` / `.lib` / `.dll` / `.dylib`）；`.gitignore` 不再忽略 `Source/ThirdParty/Lua` 下这些文件；二进制走 Git LFS

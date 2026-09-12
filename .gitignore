@@ -26,6 +26,18 @@
 *.a
 *.lib
 
+# 官方随源码分发的 Lua 预编译库（各平台 lib-c / lib-cpp）
+!Source/ThirdParty/Lua/**/lib-c/**/*.a
+!Source/ThirdParty/Lua/**/lib-c/**/*.lib
+!Source/ThirdParty/Lua/**/lib-c/**/*.dll
+!Source/ThirdParty/Lua/**/lib-c/**/*.dylib
+!Source/ThirdParty/Lua/**/lib-c/**/*.so
+!Source/ThirdParty/Lua/**/lib-cpp/**/*.a
+!Source/ThirdParty/Lua/**/lib-cpp/**/*.lib
+!Source/ThirdParty/Lua/**/lib-cpp/**/*.dll
+!Source/ThirdParty/Lua/**/lib-cpp/**/*.dylib
+!Source/ThirdParty/Lua/**/lib-cpp/**/*.so
+
 # Executables
 *.exe
 *.out
@@ -42,11 +54,11 @@
 *.VC.db
 *.VC.opendb
 
-# 插件构建产物
+# 插件构建产物（/release/ 仅忽略仓库根目录，避免误伤 lib-c/Win64/Release 等预编译库）
 Binaries/
 Intermediate/
 Build/
-release/
+/release/
 
 # UBT / MSBuild 中间文件
 obj/
