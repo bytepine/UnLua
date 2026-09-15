@@ -323,10 +323,25 @@ static int32 FSoftObjectPtr_LoadSynchronous(lua_State* L)
     return 1;
 }
 
+static int32 FSoftObjectPtr_Set(lua_State* L)
+{
+    int32 NumParams = lua_gettop(L);
+    if (NumParams < 2)
+        return luaL_error(L, "invalid parameters");
+
+    FSoftObjectPtr* A = (FSoftObjectPtr*)GetCppInstanceFast(L, 1);
+    if (!A)
+        return 0;
+
+    *A = UnLua::GetUObject(L, 2);
+    return 0;
+}
+
 static const luaL_Reg FSoftObjectPtrLib[] =
 {
     {"__tostring", FSoftObjectPtr_ToString},
     {"LoadSynchronous", FSoftObjectPtr_LoadSynchronous},
+    {"Set", FSoftObjectPtr_Set},
     {nullptr, nullptr}
 };
 
@@ -335,7 +350,6 @@ BEGIN_EXPORT_CLASS(FSoftObjectPtr, const UObject*)
     ADD_CONST_FUNCTION_EX("IsNull", bool, IsNull)
     ADD_CONST_FUNCTION_EX("IsPending", bool, IsPending)
     ADD_FUNCTION_EX("Reset", void, Reset)
-    ADD_FUNCTION_EX("Set", FSoftObjectPtr&, operator=, const UObject*)
     ADD_FUNCTION_EX("GetAssetName", FString, GetAssetName)
     ADD_FUNCTION_EX("GetLongPackageName", FString, GetLongPackageName)
     ADD_CONST_FUNCTION_EX("Get", UObject*, Get)
