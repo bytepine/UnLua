@@ -34,7 +34,7 @@ namespace UnLua
     FClassRegistry::~FClassRegistry()
     {
         TSet<FClassDesc*> Unique;
-        for (const auto Pair : Name2Classes)
+        for (const auto& Pair : Name2Classes)
             Unique.Add(Pair.Value);
         for (const auto Desc : Retired)
             Unique.Add(Desc);
