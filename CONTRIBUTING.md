@@ -1,6 +1,12 @@
 # 为 UnLua（bytepine 提取）做贡献
 
+中文 | [English](CONTRIBUTING.en.md)
+
 本仓是 [Tencent/UnLua](https://github.com/Tencent/UnLua) `Plugins/UnLua` 的非官方提取（基线 v2.3.6）。**不是**腾讯官方仓。上游版权声明见 [LICENSE.TXT](LICENSE.TXT)；改官方源文件须保留腾讯版权头。
+
+## 文档
+
+所有维护文档必须提供完整的中英双语内容，中文和英文必须分别维护在独立文件中，并在顶部相互链接。README、贡献指南、测试指南、清单与 CHANGELOG 的新增及修改须同步两种语言；命令、路径、API 和版本号保持一致。生成文档须修改其数据源或生成器后再生成。
 
 ## 提交信息
 

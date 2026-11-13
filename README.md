@@ -1,5 +1,7 @@
 # UnLua（非官方插件提取）
 
+中文 | [English](README.en.md)
+
 从 [Tencent/UnLua](https://github.com/Tencent/UnLua) 的 `Plugins/UnLua` 提取，基线 **v2.3.6**。
 
 **不是**腾讯官方仓库，也未获腾讯背书。后续修改只在本仓进行。
@@ -30,6 +32,8 @@ git submodule add https://github.com/bytepine/UnLua.git Plugins/UnLua
 - [FAQ](https://github.com/Tencent/UnLua/blob/master/Docs/CN/FAQ.md)
 
 问题请开 [本仓 Issues](https://github.com/bytepine/UnLua/issues)，不要提到 Tencent/UnLua。
+
+所有维护文档必须提供完整中英双语内容，配对文件与 CHANGELOG 同步更新；见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 许可
 
