@@ -65,7 +65,7 @@ namespace UnLua
         case LUA_TNUMBER:
             if (lua_isinteger(L, Index))
             {
-                ReadableValue = FString::Printf(TEXT("%d"), lua_tointeger(L, Index));
+                ReadableValue = FString::Printf(TEXT("%lld"), static_cast<long long>(lua_tointeger(L, Index)));
             }
             else
             {
@@ -448,7 +448,7 @@ namespace UnLua
         case CPT_UInt64:
             {
                 FNumericProperty *NumericProperty = (FNumericProperty*)InProperty;
-                ReadableValue = FString::Printf(TEXT("%ld"), NumericProperty->GetUnsignedIntPropertyValue(ValuePtr));
+                ReadableValue = FString::Printf(TEXT("%llu"), static_cast<unsigned long long>(NumericProperty->GetUnsignedIntPropertyValue(ValuePtr)));
             }
             break;
         case CPT_Float:

@@ -69,6 +69,7 @@
 #define UL_UE_HAS_TRY_UPDATE_DEFAULT_CONFIG     UL_UE_AT_LEAST(5, 0)  // UpdateDefaultConfigFile → TryUpdateDefaultConfigFile
 #define UL_UE_HAS_COREDELEGATES_GET_POST_ENGINE_INIT UL_UE_AT_LEAST(5, 8) // OnPostEngineInit → GetOnPostEngineInit()
 #define UL_UE_HAS_FOREACH_OBJECT_GETOBJECTS_FLAGS UL_UE_AT_LEAST(5, 8) // ForEachObjectWithPackage 第三参 bool → EGetObjectsFlags
+#define UL_UE_HAS_LAZY_OBJECT_PTR           (!UL_UE_AT_LEAST(5, 9)) // 5.9 起 TLazyObjectPtr 标记为待删除
 
 #if UL_UE_HAS_PROPERTY_ELEMENT_SIZE_ACCESSOR
 #define UL_GET_PROPERTY_ELEMENT_SIZE(P) ((P)->GetElementSize())

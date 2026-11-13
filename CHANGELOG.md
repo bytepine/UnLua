@@ -26,3 +26,4 @@
 - 就地覆写路径用 `ULuaFunction::Get` 去重，避免多 env 重复登记；UE 5.3+ `ULuaOverridesClass::AddToOwner`/`RemoveFromOwner` 不再把 `Children` 写进 `TObjectPtr` 局部副本
 - 覆写 `Script` 魔数头改存 `FObjectKey`，蓝图重编译 / `UnLua.HotReload` 后不再留下野指针
 - fix(compat): Android NDK clang — `FSoftObjectPtr::Set` 不再导出 `operator=` 成员指针（重载无法 C 转，MSVC 4.26–5.5 / NDK clang 均中招），改走 Lua C 封装赋值；`FEnumRegistry` / `FClassRegistry` 析构 range-for 改引用，避免 `-Werror,-Wrange-loop-construct`
+- UE 5.9 调试值打印对 64 位整数使用 `%lld` / `%llu`；IntelliSense 类型名不再引用已废弃的 `TLazyObjectPtr`

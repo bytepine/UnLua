@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and limitations under the License.
 
 #include "UnLuaDebugBase.h"
+#include "UnLuaVersionCompat.h"
 #include <type_traits>
 
 namespace UnLua
@@ -53,7 +54,9 @@ namespace UnLua
     template <typename T> struct TTypeIntelliSense<TSoftClassPtr<T>> { static FString GetName() { return FString::Printf(TEXT("TSoftClassPtr<%s>"), *TTypeIntelliSense<T>::GetName()); } };
     template <typename T> struct TTypeIntelliSense<TSoftObjectPtr<T>> { static FString GetName() { return FString::Printf(TEXT("TSoftObjectPtr<%s>"), *TTypeIntelliSense<T>::GetName()); } };
     template <typename T> struct TTypeIntelliSense<TWeakObjectPtr<T>> { static FString GetName() { return FString::Printf(TEXT("TWeakObjectPtr<%s>"), *TTypeIntelliSense<T>::GetName()); } };
+#if UL_UE_HAS_LAZY_OBJECT_PTR
     template <typename T> struct TTypeIntelliSense<TLazyObjectPtr<T>> { static FString GetName() { return FString::Printf(TEXT("TLazyObjectPtr<%s>"), *TTypeIntelliSense<T>::GetName()); } };
+#endif
     template <typename T> struct TTypeIntelliSense<TScriptInterface<T>> { static FString GetName() { return FString::Printf(TEXT("TScriptInterface<%s>"), *TTypeIntelliSense<T>::GetName()); } };
 
     template <typename T, typename Allocator>
